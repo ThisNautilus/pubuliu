@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>瀑布流</title>
+    <style>
+            * {
+            margin: 0;
+            padding: 0;
+        }
+        
+        .container {
+            width: 1313px;
+            margin: 20px auto;
+            position: relative;
+        }
+        
+        .img-item {
+            border: 1px solid black;
+            padding: 2px;
+            position: absolute;
+        }
+        /* 设置boder中图片垂直居中 */
+        
+        .img-item img {
+            vertical-align: middle;
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="img-item">
+            <img src="./images/3.jpg" alt="">
+        </div>
+        <div class="img-item">
+            <img src="./images/4.jpg" alt="">
+        </div>
+        <div class="img-item">
+            <img src="./images/5.jpg" alt="">
+        </div>
+        <div class="img-item">
+            <img src="./images/6.jpg" alt="">
+        </div>
+        <div class="img-item">
+            <img src="./images/7.jpg" alt="">
+        </div>
+        <div class="img-item">
+            <img src="./images/8.jpg" alt="">
+        </div>
+        <div class="img-item">
+            <img src="./images/9.jpg" alt="">
+        </div>
+        <div class="img-item">
+            <img src="./images/10.jpg" alt="">
+        </div>
+        <div class="img-item">
+            <img src="./images/11.jpg" alt="">
+        </div>
+        <div class="img-item">
+            <img src="./images/12.jpg" alt="">
+        </div>
+        <div class="img-item">
+            <img src="./images/13.jpg" alt="">
+        </div>
+        <div class="img-item">
+            <img src="./images/14.jpg" alt="">
+        </div>
+        <div class="img-item">
+            <img src="./images/15.jpg" alt="">
+        </div>
+        <div class="img-item">
+            <img src="./images/16.jpg" alt="">
+        </div>
+    </div>
+
+    <script>
+        // 首先保证页面图片加载完毕后开始执行程序  否则无法获取图片的宽度
+        window.onload = function() {
+            var container = document.getElementsByClassName("container")[0];
+            var imgItem = document.getElementsByClassName("img-item");
+            // 1.获取父盒子的宽度
+            var containerWidth = container.offsetWidth;
+            // 2.获取图片的宽度
+            var imgItemWidth = imgItem[0].offsetWidth;
+            // 3.计算列数
+            var column = parseInt(containerWidth / imgItemWidth);
+            // 4.计算间距
+            var distance = (containerWidth - imgItemWidth * column) / (column - 1);
+            // 5.实现瀑布流布局
+            var heightArr = [];
+            waterFall();
+            // 6.滚动页面加载数据
+            // window.pageYOffset 页面垂直方向滚动的像素距离
+            // window.innerHeight 浏览器高度（可用高度）
+            window.onscroll = function() {
+                if ((window.pageYOffset + window.innerHeight) > getHeight(heightArr).minHeight) {
+                    console.log(window.pageYOffset + window.innerHeight);
+                    console.log(getHeight(heightArr).minHeight);
+                    // 虚拟图片数据
+                    var data = [{
+                        "src": "./images/17.jpg"
+                    }, {
+                        "src": "./images/18.jpg"
+                    }, {
+                        "src": "./images/19.jpg"
+                    }, {
+                        "src": "./images/20.jpg"
+                    }, {
+                        "src": "./images/21.jpg"
+                    }, {
+                        "src": "./images/22.jpg"
+                    }, {
+                        "src": "./images/23.jpg"
+                    }, {
+                        "src": "./images/1.jpg"
+                    }, {
+                        "src": "./images/2.jpg"
+                    }, {
+                        "src": "./images/3.jpg"
+                    }, {
+                        "src": "./images/4.jpg"
+                    }, {
+                        "src": "./images/5.jpg"
+                    }];
+                    for (var i = 0; i < data.length; i++) {
+                        // 创建div以及其中的img元素 并追加到container中
+                        var div = document.createElement("div");
+                        div.className = "img-item";
+                        var img = document.createElement("img");
+                        img.src = data[i].src;
+                        div.appendChild(img);
+                        container.appendChild(div);
+                    }
+                    // 调用瀑布流方法
+                    waterFall();
+                }
+            }
+
+
+
+
+            // 瀑布流的实现方式核心思想：在绝对定位的基础上，设置图片的top和left值
+            function waterFall() {
+                for (var i = 0; i < imgItem.length; i++) {
+                    if (i < column) {
+                        imgItem[i].style.left = (imgItemWidth + distance) * i + "px";
+                        heightArr[i] = imgItem[i].offsetHeight;
+                    } else {
+                        minHeight = getHeight(heightArr).minHeight;
+                        minIndex = getHeight(heightArr).minIndex;
+                        imgItem[i].style.left = (imgItemWidth + distance) * minIndex + "px";
+                        imgItem[i].style.top = minHeight + distance + "px";
+                        // 将被追加图片的这一列重新进行赋值
+                        heightArr[minIndex] = minHeight + distance + imgItem[i].offsetHeight;
+                    }
+                }
+            }
+            // 思想：获取图片高度最小的列的索引及高度
+            function getHeight(heightArr) {
+                var result = {};
+                result.minHeight = heightArr[0];
+                result.minIndex = 0;
+                for (var i = 1; i < heightArr.length; i++) {
+                    if (heightArr[i] < result.minHeight) {
+                        result.minHeight = heightArr[i];
+                        result.minIndex = i;
+                    }
+                }
+                return result;
+            }
+        }
+    </script>
+</body>
+
+</html>
